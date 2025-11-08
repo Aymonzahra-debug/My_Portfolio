@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Beautiful To-Do List</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="todo-container">
+    <h2>🌟 My To-Do List</h2>
+
+    <!-- Task Input Section -->
+    <input type="text" id="taskInput" placeholder="What do you need to do?">
+    <button onclick="addTask()">Add</button>
+
+    <!-- Task List Section -->
+    <ul id="taskList"></ul>
+    <p class="no-tasks" id="noTasks">No tasks yet.</p>
+  </div>
+
+  <script>
+    let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(taskList));
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      const emptyMsg = document.getElementById("noTasks");
+      list.innerHTML = "";
+
+      if (taskList.length === 0) {
+        emptyMsg.style.display = "block";
+      } else {
+        emptyMsg.style.display = "none";
+      }
+
+      taskList.forEach((task, index) => {
+        const li = document.createElement("li");
+        li.className = task.completed ? "completed" : "";
+        li.innerHTML = `
+          <span>${task.text}</span>
+          <div class="actions">
+            <button onclick="toggleTask(${index})">✔</button>
+            <button onclick="deleteTask(${index})">🗑</button>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const text = input.value.trim();
+      if (text === "") {
+        alert("Please enter a task.");
+        return;
+      }
+      taskList.push({ text: text, completed: false });
+      input.value = "";
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleTask(index) {
+      taskList[index].completed = !taskList[index].completed;
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(index) {
+      taskList.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    }
+
+    // Load tasks on page load
+    renderTasks();
+  </script>
+</body>
+</html>
